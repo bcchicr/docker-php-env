@@ -17,6 +17,8 @@ services:
     build:
       context: ./php
       dockerfile: Dockerfile
+      args:
+        PHP_ENABLE_XDEBUG: ${PHP_ENABLE_XDEBUG}
     ports:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
@@ -34,5 +36,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
 
+  redis:
+    image: redis:7.2
+    ports:
+      - ${NETWORK_INTERFACE}:${REDIS_PORT}:6379
+
 volumes:
   psql_vol:
+  redis_vol:
