@@ -24,6 +24,9 @@ services:
     volumes:
       - ./app:/var/www/
       - ./php/ini/${PHP_INI_FILE}:/usr/local/etc/php/php.ini
+      - ./php/ini/conf.d:/usr/local/etc/php/conf.d/
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   postgres:
     image: postgres:16
