@@ -4,7 +4,10 @@
   },
   "autoload": {
     "psr-4": {
-      "Bcchicr\\StudentList\\": "src/"
+      "Bcchicr\\StudentList\\": [
+        "src/",
+        "tests/"
+      ]
     }
   }
 }

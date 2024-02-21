@@ -27,6 +27,13 @@ services:
       - ./php/ini/conf.d:/usr/local/etc/php/conf.d/
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE}
+      PGSQL_HOST: postgres
+      PGSQL_PORT: 5432
+      DB_CONNECTION: pgsql
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+
     extra_hosts:
       - host.docker.internal:host-gateway
 
@@ -37,9 +44,9 @@ services:
     volumes:
       - psql_vol:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_DATABASE}
 
   redis:
     image: redis:7.2
