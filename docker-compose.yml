@@ -21,7 +21,7 @@ services:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
       - ./app:/var/www/
-      - ./php/${PHP_INI_FILE}:/usr/local/etc/php/php.ini
+      - ./php/ini/${PHP_INI_FILE}:/usr/local/etc/php/php.ini
 
   postgres:
     image: postgres:16
