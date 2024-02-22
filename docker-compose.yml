@@ -11,7 +11,8 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d/
       - ./nginx/logs:/var/log/nginx/
     depends_on:
-      - php81fpm
+      php81fpm:
+        condition: service_started
 
   php81fpm:
     build:
