@@ -1,5 +1,5 @@
 .env
-/nginx/logs/**
-/app/vendor
-!/app/vendor/.gitkeep
+/nginx/logs/*
+app/vendor/*
+!app/vendor/.gitkeep
 .vscode
