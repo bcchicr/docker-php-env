@@ -1,7 +1,7 @@
 version: "3"
 
 services:
-  nginx:
+  server:
     image: nginx:1.25
     restart: unless-stopped
     ports:
@@ -11,10 +11,10 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d/
       - ./nginx/logs:/var/log/nginx/
     depends_on:
-      php81fpm:
+      app:
         condition: service_started
 
-  php81fpm:
+  app:
     build:
       context: ./php
       dockerfile: Dockerfile
@@ -27,29 +27,25 @@ services:
       - ./app:/var/www/
       - ./php/ini/${PHP_INI_FILE}:/usr/local/etc/php/php.ini
       - ./php/ini/conf.d:/usr/local/etc/php/conf.d/
+    env_file:
+      - ./.env
     environment:
-      XDEBUG_MODE: ${XDEBUG_MODE}
-      PGSQL_HOST: postgres
-      PGSQL_PORT: 5432
-      DB_CONNECTION: pgsql
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
+      DB_HOST: db
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-      redis:
+      cache:
         condition: service_healthy
 
-  postgres:
+  db:
     image: postgres:16
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${POSTGRES_PORT}:5432
     volumes:
-      - psql_vol:/var/lib/postgresql/data
+      - db_vol:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -60,13 +56,13 @@ services:
       timeout: 5s
       retries: 3
 
-  redis:
+  cache:
     image: redis:7.2
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${REDIS_PORT}:6379
     volumes:
-      - redis_vol:/data
+      - cache_vol:/data
       - ./redis/conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD-SHELL", "redis-cli", "ping"]
@@ -75,5 +71,5 @@ services:
       retries: 3
 
 volumes:
-  psql_vol:
-  redis_vol:
+  db_vol:
+  cache_vol:

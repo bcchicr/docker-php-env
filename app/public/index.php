@@ -1,3 +1,3 @@
 <?php
 
-xdebug_info();
+echo getenv('DB_CONNECTION');
