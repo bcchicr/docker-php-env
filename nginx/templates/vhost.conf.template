@@ -1,9 +1,9 @@
 server {
     listen 80;
     index index.php index.html;
-    server_name student-list;
-    error_log /var/log/nginx/student-list.error.log;
-    access_log /var/log/nginx/student-list.access.log combined if=$loggable;
+    server_name localhost;
+    error_log /var/log/nginx/${APP_NAME}.error.log;
+    access_log /var/log/nginx/${APP_NAME}.access.log combined if=$loggable;
     root /var/www/html/public/;
 
     location / {

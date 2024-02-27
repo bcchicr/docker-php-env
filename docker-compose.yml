@@ -2,14 +2,21 @@ version: "3"
 
 services:
   server:
-    image: nginx:1.25
+    image: nginx:${NGINX_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${NGINX_PORT}:80
     volumes:
-      - ./app:/var/www/html
-      - ./nginx/conf.d:/etc/nginx/conf.d/
-      - ./nginx/logs:/var/log/nginx/
+      - ./app/:/var/www/html/
+      - ./nginx/templates/:/etc/nginx/templates/
+      - ./nginx/logs/:/var/log/nginx/
+    environment:
+      APP_NAME: ${APP_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -I http://localhost || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
     depends_on:
       app:
         condition: service_started
@@ -18,22 +25,19 @@ services:
     build:
       context: ./
       dockerfile: ./php/Dockerfile
+      target: ${PHP_TARGET}
       args:
-        PHP_ENABLE_XDEBUG: ${PHP_ENABLE_XDEBUG}
-      target: development
+        PHP_VERSION: ${PHP_VERSION}
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
-      - dep_vol:/var/www/html/vendor
-      - ./app:/var/www/html
-      - ./php/ini/${PHP_INI_FILE}:/usr/local/etc/php/php.ini
-      - ./php/ini/conf.d:/usr/local/etc/php/conf.d/
+      - ./app/:/var/www/html/
     env_file:
       - ./.env
     environment:
       DB_HOST: db
-    command: ["php-fpm"]
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
@@ -43,42 +47,36 @@ services:
         condition: service_healthy
 
   db:
-    image: postgres:16
+    image: postgres:${POSTGRES_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${POSTGRES_PORT}:5432
     volumes:
-      - db_vol:/var/lib/postgresql/data
+      - db_vol:/var/lib/postgresql/data/
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
       interval: 5s
       timeout: 5s
       retries: 3
 
   cache:
-    image: redis:7.2
+    image: redis:${REDIS_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${REDIS_PORT}:6379
     volumes:
-      - cache_vol:/data
+      - cache_vol:/data/
       - ./redis/conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli ping"]
       interval: 5s
       timeout: 5s
       retries: 3
 
 volumes:
-  dep_vol:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./app/vendor
-      o: bind
   db_vol:
   cache_vol:
