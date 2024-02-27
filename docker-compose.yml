@@ -12,11 +12,6 @@ services:
       - ./nginx/logs/:/var/log/nginx/
     environment:
       APP_NAME: ${APP_NAME}
-    healthcheck:
-      test: ["CMD-SHELL", "curl -I http://localhost || exit 1"]
-      interval: 30s
-      timeout: 30s
-      retries: 5
     depends_on:
       app:
         condition: service_started
@@ -25,10 +20,10 @@ services:
     build:
       context: ./
       dockerfile: ./php/Dockerfile
-      target: ${PHP_TARGET}
+      target: ${APP_TARGET}
       args:
         PHP_VERSION: ${PHP_VERSION}
-        COMPOSER_VERSION: ${COMPOSER_VERSION}
+    command: ["php-fpm"]
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
@@ -45,6 +40,18 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
+      composer:
+        condition: service_completed_successfully
+
+  composer:
+    build:
+      context: ./php/composer
+      dockerfile: Dockerfile
+      args:
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
+      target: ${APP_TARGET}
+    volumes:
+      - ./app/:/app
 
   db:
     image: postgres:${POSTGRES_VERSION}
