@@ -6,14 +6,29 @@ Docker + Docker Compose
 
 ## Установка
 
-1. Выполните клонирование репозитория в корневую папку проекта.
+1. Выполните клонирование этого репозитория в корневую папку проекта.
 
 ```shell script
-$ git clone https://github.com/bcchicr/docker-php-workspace.git
+git clone https://github.com/bcchicr/docker-php-env.git
 ```
 
-2. В папке проекта скопируйте `.env-example` в `.env`
+Перейдите в директорию, в которую был клонирован репозиторий. Дальнейшие команды следует выполнять в этой директории.
+
+2. Скопируйте `.env.example` в `.env`.
 
 ```shell script
-$ cp .env-example .env
+cp .env.example .env
 ```
+
+Измените настройки среды в соответствии с вашими требованиями.
+
+3. Запустите контейнеры.`
+
+```shell script
+docker compose up -d
+```
+
+4. Откройте приложение в браузере.
+
+Приложение будет доступно по адресу `${NETWORK_INTERFACE}`:`${NGINX_PORT}`.
+По умолчанию `${NETWORK_INTERFACE}=127.0.0.1`, `${NGINX_PORT}=80`.
