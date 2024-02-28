@@ -1,4 +1,6 @@
 ARG PHP_VERSION
+ARG COMPOSER_VERSION
+FROM composer:${COMPOSER_VERSION} as composer-stage
 
 FROM php:${PHP_VERSION}-fpm as base
 RUN apt-get update && apt-get install -y \
@@ -19,6 +21,7 @@ RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
 RUN pecl install redis && \
       docker-php-ext-enable redis
 COPY ./php/ini/conf.d/ /usr/local/etc/php/conf.d/
+COPY --from=composer-stage /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 EXPOSE 9000
 

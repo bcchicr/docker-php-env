@@ -23,6 +23,7 @@ services:
       target: ${APP_TARGET}
       args:
         PHP_VERSION: ${PHP_VERSION}
+        COMPOSER_VERSION: ${COMPOSER_VERSION}
     command: ["php-fpm"]
     restart: unless-stopped
     ports:
@@ -40,10 +41,10 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-      composer:
+      composer-deps:
         condition: service_completed_successfully
 
-  composer:
+  composer-deps:
     build:
       context: ./php/composer
       dockerfile: Dockerfile
