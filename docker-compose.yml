@@ -7,7 +7,7 @@ services:
     ports:
       - ${NETWORK_INTERFACE}:${NGINX_PORT}:80
     volumes:
-      - ./app/:/var/www/html/
+      - ${APP_CODE_PATH}:/var/www/html/
       - ./nginx/templates/:/etc/nginx/templates/
       - ./nginx/logs/:/var/log/nginx/
     environment:
@@ -28,7 +28,7 @@ services:
     ports:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
-      - ./app/:/var/www/html/
+      - ${APP_CODE_PATH}:/var/www/html/
     env_file:
       - ./.env
     environment:
@@ -51,7 +51,7 @@ services:
         COMPOSER_VERSION: ${COMPOSER_VERSION}
       target: ${APP_TARGET}
     volumes:
-      - ./app/:/app
+      - ${APP_CODE_PATH}:/app
 
   db:
     image: postgres:${POSTGRES_VERSION}
