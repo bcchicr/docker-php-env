@@ -1,4 +1,2 @@
 .env
 /nginx/logs/**
-app/vendor
-.vscode
