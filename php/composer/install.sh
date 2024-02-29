@@ -14,10 +14,14 @@ if ! [[ -f /app/composer.json ]]; then
 fi
 
 if [[ $1 == "development" ]]; then
-    composer install --no-interaction
+    params=""
 elif [[ $1 == "final" ]]; then
-    composer install --optimize-autoloader --no-dev --no-interaction
+    params="--optimize-autoloader --no-dev"
 else
     >&2 echo "Unknown build target"
     exit 1
 fi
+
+composer -n install $params
+composer -n update
+
