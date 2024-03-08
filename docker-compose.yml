@@ -30,10 +30,8 @@ services:
       - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
       - ${APP_CODE_PATH}:/var/www/html/
-    env_file:
-      - ./.env
     environment:
-      DB_HOST: db
+      - XDEBUG_MODE: ${XDEBUG_MODE}
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
