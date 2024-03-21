@@ -2,6 +2,7 @@ version: "3"
 
 services:
   server:
+    container_name: ${APP_NAME}-server
     image: nginx:${NGINX_VERSION}
     restart: unless-stopped
     ports:
@@ -17,6 +18,7 @@ services:
         condition: service_started
 
   app:
+    container_name: ${APP_NAME}-app
     build:
       context: ./
       dockerfile: ./php/Dockerfile
@@ -31,7 +33,7 @@ services:
     volumes:
       - ${APP_CODE_PATH}:/var/www/html/
     environment:
-      - XDEBUG_MODE: ${XDEBUG_MODE}
+      XDEBUG_MODE: ${XDEBUG_MODE}
     extra_hosts:
       - host.docker.internal:host-gateway
     depends_on:
@@ -43,6 +45,7 @@ services:
         condition: service_completed_successfully
 
   composer-deps:
+    container_name: ${APP_NAME}-composer-deps
     build:
       context: ./php/composer
       dockerfile: Dockerfile
@@ -53,12 +56,14 @@ services:
       - ${APP_CODE_PATH}:/app
 
   db:
+    container_name: ${APP_NAME}-db
     image: postgres:${POSTGRES_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${POSTGRES_PORT}:5432
     volumes:
-      - db_vol:/var/lib/postgresql/data/
+      - db-vol:/var/lib/postgresql/data/
+      - ./postgres/dump:/dump
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -70,12 +75,13 @@ services:
       retries: 3
 
   cache:
+    container_name: ${APP_NAME}-cache
     image: redis:${REDIS_VERSION}
     restart: unless-stopped
     ports:
       - ${NETWORK_INTERFACE}:${REDIS_PORT}:6379
     volumes:
-      - cache_vol:/data/
+      - cache-vol:/data/
       - ./redis/conf:/usr/local/etc/redis/redis.conf
     healthcheck:
       test: ["CMD-SHELL", "redis-cli ping"]
@@ -84,5 +90,7 @@ services:
       retries: 3
 
 volumes:
-  db_vol:
-  cache_vol:
+  db-vol:
+    name: ${APP_NAME}-db-vol
+  cache-vol:
+    name: ${APP_NAME}-cache-vol
