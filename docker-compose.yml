@@ -94,3 +94,7 @@ volumes:
     name: ${APP_NAME}-db-vol
   cache-vol:
     name: ${APP_NAME}-cache-vol
+
+networks:
+  default:
+    name: ${APP_NAME}-network;
