@@ -28,8 +28,6 @@ services:
         COMPOSER_VERSION: ${COMPOSER_VERSION}
     command: ["php-fpm"]
     restart: unless-stopped
-    ports:
-      - ${NETWORK_INTERFACE}:${PHP_PORT}:9000
     volumes:
       - ${APP_CODE_PATH}:/var/www/html/
     environment:
@@ -54,6 +52,16 @@ services:
       target: ${APP_TARGET}
     volumes:
       - ${APP_CODE_PATH}:/app
+
+  adminer:
+    container_name: ${APP_NAME}-adminer
+    image: adminer:${ADMINER_VERSION}
+    restart: unless-stopped
+    ports:
+      - ${NETWORK_INTERFACE}:${ADMINER_PORT}:8080
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     container_name: ${APP_NAME}-db
