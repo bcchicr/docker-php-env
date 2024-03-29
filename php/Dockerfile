@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     jpegoptim optipng pngquant gifsicle
-RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
+RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl bcmath
 RUN pecl install redis && \
       docker-php-ext-enable redis
 COPY ./php/ini/conf.d/ /usr/local/etc/php/conf.d/
