@@ -1,5 +1,6 @@
 ARG COMPOSER_VERSION
 FROM composer:${COMPOSER_VERSION} as base
+RUN docker-php-ext-install bcmath
 COPY ./install.sh /usr/local/bin/install.sh
 
 FROM base as development
