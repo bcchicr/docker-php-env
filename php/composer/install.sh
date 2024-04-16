@@ -8,7 +8,7 @@ elif [[ $# -gt 1 ]]; then
     exit 1
 fi
 
-if ! [[ -f /app/composer.json ]]; then
+if ! [[ -f ./composer.json ]]; then
     echo "No composer.json provided."
     exit 0
 fi

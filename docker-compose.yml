@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 services:
   server:
@@ -22,11 +22,11 @@ services:
     build:
       context: ./
       dockerfile: ./php/Dockerfile
-      target: ${APP_TARGET}
+      target: ${APP_TARGET}-app
       args:
         PHP_VERSION: ${PHP_VERSION}
         COMPOSER_VERSION: ${COMPOSER_VERSION}
-    command: ["php-fpm"]
+    command: ['php-fpm']
     restart: unless-stopped
     volumes:
       - ${APP_CODE_PATH}:/var/www/html/
@@ -45,13 +45,14 @@ services:
   composer-deps:
     container_name: ${APP_NAME}-composer-deps
     build:
-      context: ./php/composer
+      context: ./php/
       dockerfile: Dockerfile
       args:
+        PHP_VERSION: ${PHP_VERSION}
         COMPOSER_VERSION: ${COMPOSER_VERSION}
-      target: ${APP_TARGET}
+      target: ${APP_TARGET}-composer-deps
     volumes:
-      - ${APP_CODE_PATH}:/app
+      - ${APP_CODE_PATH}:/var/www/html/
 
   adminer:
     container_name: ${APP_NAME}-adminer
@@ -77,7 +78,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_DATABASE}"]
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_DATABASE}']
       interval: 5s
       timeout: 5s
       retries: 3
@@ -92,7 +93,7 @@ services:
       - cache-vol:/data/
       - ./redis/conf:/usr/local/etc/redis/redis.conf
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli ping"]
+      test: ['CMD-SHELL', 'redis-cli ping']
       interval: 5s
       timeout: 5s
       retries: 3
