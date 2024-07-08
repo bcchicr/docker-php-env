@@ -26,10 +26,14 @@ services:
       args:
         PHP_VERSION: ${PHP_VERSION}
         COMPOSER_VERSION: ${COMPOSER_VERSION}
+        user: ${USER}
+        uid: ${UID}
     command: ['php-fpm']
     restart: unless-stopped
     volumes:
       - ${APP_CODE_PATH}:/var/www/html/
+      - ./php/ini/conf.d/:/usr/local/etc/php/conf.d/
+      - ./php/ini/${APP_TARGET}.php.ini:/usr/local/etc/php/php.ini
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE}
     extra_hosts:
@@ -39,20 +43,20 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-      composer-deps:
-        condition: service_completed_successfully
+#      composer-deps:
+#        condition: service_completed_successfully
 
-  composer-deps:
-    container_name: ${APP_NAME}-composer-deps
-    build:
-      context: ./php/
-      dockerfile: Dockerfile
-      args:
-        PHP_VERSION: ${PHP_VERSION}
-        COMPOSER_VERSION: ${COMPOSER_VERSION}
-      target: ${APP_TARGET}-composer-deps
-    volumes:
-      - ${APP_CODE_PATH}:/var/www/html/
+#  composer-deps:
+#    container_name: ${APP_NAME}-composer-deps
+#    build:
+#      context: ./php/
+#      dockerfile: Dockerfile
+#      args:
+#        PHP_VERSION: ${PHP_VERSION}
+#        COMPOSER_VERSION: ${COMPOSER_VERSION}
+#      target: ${APP_TARGET}-composer-deps
+#    volumes:
+#      - ${APP_CODE_PATH}:/var/www/html/
 
   adminer:
     container_name: ${APP_NAME}-adminer
