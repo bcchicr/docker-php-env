@@ -1,3 +1,5 @@
+name: ${APP_NAME}
+
 services:
   server:
     container_name: ${APP_NAME}-server
@@ -26,8 +28,11 @@ services:
         COMPOSER_VERSION: ${COMPOSER_VERSION}
         user: ${USER}
         uid: ${UID}
-    command: ['php-fpm']
+    command: php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=roadrunner --host=0.0.0.0 --port=8080
     restart: unless-stopped
+    networks:
+      - default
+      - rabbitmq
     ports:
       - ${NETWORK_INTERFACE}:${ROAD_RUNNER_PORT}:8080
     volumes:
@@ -42,6 +47,18 @@ services:
       cache:
         condition: service_healthy
 
+#  rabbitmq:
+#    image: rabbitmq:3-management
+#    container_name: ${APP_NAME}-rabbitmq
+#    ports:
+#      - ${NETWORK_INTERFACE}:5672:5672
+#      - ${NETWORK_INTERFACE}:15672:15672
+#    labels:
+#      NAME: rabbitmq
+#    volumes:
+#      - ./rabbitmq/data/:/var/lib/rabbitmq/
+#      - ./rabbitmq/log/:/var/log/rabbitmq/
+
   adminer:
     container_name: ${APP_NAME}-adminer
     image: adminer:${ADMINER_VERSION}
@@ -51,6 +68,19 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+#  buggregator:
+#    container_name: ${APP_NAME}-buggregator
+#    image: ghcr.io/buggregator/server:dev
+#    restart: unless-stopped
+#    ports:
+#      - ${NETWORK_INTERFACE}:8000:8000
+#      - ${NETWORK_INTERFACE}:1025:1025
+#      - ${NETWORK_INTERFACE}:9912:9912
+#      - ${NETWORK_INTERFACE}:9913:9913
+#    depends_on:
+#      app:
+#        condition: service_started
 
   db:
     container_name: ${APP_NAME}-db
@@ -95,3 +125,5 @@ volumes:
 networks:
   default:
     name: ${APP_NAME}-network;
+  rabbitmq:
+    external: true

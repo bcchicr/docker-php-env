@@ -1,3 +1,4 @@
 .env
 /nginx/logs/**
 /postgres/dump/**
+/rabbitmq/
