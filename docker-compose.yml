@@ -28,7 +28,7 @@ services:
         COMPOSER_VERSION: ${COMPOSER_VERSION}
         user: ${USER}
         uid: ${UID}
-    command: php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=roadrunner --host=0.0.0.0 --port=8080
+#    command: php -d variables_order=EGPCS /var/www/html/artisan octane:start --server=roadrunner --host=0.0.0.0 --port=8080
     restart: unless-stopped
     networks:
       - default
@@ -36,6 +36,7 @@ services:
     ports:
       - ${NETWORK_INTERFACE}:${ROAD_RUNNER_PORT}:8080
     volumes:
+      - ./php/ini/development.php.ini:/usr/local/etc/php/php.ini
       - ${APP_CODE_PATH}:/var/www/html/
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE}
@@ -69,18 +70,18 @@ services:
       db:
         condition: service_healthy
 
-#  buggregator:
-#    container_name: ${APP_NAME}-buggregator
-#    image: ghcr.io/buggregator/server:dev
-#    restart: unless-stopped
-#    ports:
-#      - ${NETWORK_INTERFACE}:8000:8000
-#      - ${NETWORK_INTERFACE}:1025:1025
-#      - ${NETWORK_INTERFACE}:9912:9912
-#      - ${NETWORK_INTERFACE}:9913:9913
-#    depends_on:
-#      app:
-#        condition: service_started
+  buggregator:
+    container_name: ${APP_NAME}-buggregator
+    image: ghcr.io/buggregator/server:dev
+    restart: unless-stopped
+    ports:
+      - ${NETWORK_INTERFACE}:${BR_HTTP_DUMPS_PORT}:8000
+      - ${NETWORK_INTERFACE}:${BR_SMTP_PORT}:1025
+      - ${NETWORK_INTERFACE}:${BR_VAR_DUMPER_PORT}:9912
+      - ${NETWORK_INTERFACE}:${BR_MONOLOG_PORT}:9913
+    depends_on:
+      app:
+        condition: service_started
 
   db:
     container_name: ${APP_NAME}-db

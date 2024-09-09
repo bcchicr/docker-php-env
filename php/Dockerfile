@@ -1,5 +1,5 @@
-ARG PHP_VERSION
-ARG COMPOSER_VERSION
+ARG PHP_VERSION=latest
+ARG COMPOSER_VERSION=latest
 FROM composer:${COMPOSER_VERSION} AS composer-stage
 
 FROM php:${PHP_VERSION}-fpm AS base
@@ -35,10 +35,10 @@ WORKDIR /var/www/html
 EXPOSE 9000
 
 FROM base-app AS development-app
+COPY ./php/ini/development.php.ini /usr/local/etc/php/php.ini
 RUN pecl install xdebug && \
     docker-php-ext-enable xdebug
 USER $user
-# COPY ./php/ini/dev.php.ini /usr/local/etc/php/php.ini
 
 FROM base-app AS final-app
 # COPY ./php/ini/prod.php.ini /usr/local/etc/php/php.ini
